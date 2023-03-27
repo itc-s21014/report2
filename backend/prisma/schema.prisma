@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Student {
+  id                     Int                      @id @default(autoincrement())
+  code                   String                   @unique
+  name                   String
+  Absence                Absence[]
+  CertificateApplication CertificateApplication[]
+}
+
+model Absence {
+  id         Int       @id @default(autoincrement())
+  student    Student   @relation(fields: [student_id], references: [id])
+  student_id Int
+  kind       Int
+  reason     String?
+  start_date DateTime
+  end_date   DateTime?
+  created_at DateTime  @default(now())
+}
+
+model CertificateApplication {
+  id                                 Int      @id @default(autoincrement())
+  student                            Student  @relation(fields: [student_id], references: [id])
+  student_id                         Int
+  certificate_of_enrollment          Int      @default(0)
+  transcript                         Int      @default(0)
+  attendance_certificate             Int      @default(0)
+  certificate_of_expected_graduation Int      @default(0)
+  graduation_certificate             Int      @default(0)
+  health_certificate                 Int      @default(0)
+  created_at                         DateTime @default(now())
+  scheduled_date                     DateTime @default(dbgenerated("NOW() + '7 days'"))
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
